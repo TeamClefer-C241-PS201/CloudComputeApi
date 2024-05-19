@@ -1,0 +1,22 @@
+{
+  "name": "cleferdev",
+  "version": "1.0.0",
+  "description": "Clefer Code Project",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TeamClefer-C241-PS201/CloudComputeApi.git"
+  },
+  "author": "Rafiarian, Syifa Mumtaz",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/TeamClefer-C241-PS201/CloudComputeApi/issues"
+  },
+  "homepage": "https://github.com/TeamClefer-C241-PS201/CloudComputeApi#readme",
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
