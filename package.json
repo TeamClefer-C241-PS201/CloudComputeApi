@@ -1,0 +1,15 @@
+{
+  "name": "cloudcomputeapi",
+  "version": "1.0.0",
+  "description": "This repository is for the server side developer",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
