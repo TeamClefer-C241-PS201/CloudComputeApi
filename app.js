@@ -2,10 +2,11 @@
 require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
-const passport = require('./config/passport'); // Adjust the path if needed
-const indexRoutes = require('./routes/index');
-const authRoutes = require('./routes/authRoutes');
+const passport = require('./app/config/passport'); 
+const indexRoutes = require('./app/routes/index');
+const authRoutes = require('./app/routes/authRoutes');
 const mysql = require('mysql2');
+require('dotenv').config();
 
 const app = express();
 
