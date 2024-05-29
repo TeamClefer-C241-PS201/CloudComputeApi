@@ -14,10 +14,12 @@ User.findOne = async (userData) => {
 
 User.create = async (userData) => {
   try {
+    console.log(userData);
     const sql = 'INSERT INTO users ( googleId, name) VALUES ( :googleId, :name)';
-    const params = { googleID: userData.googleID, name: userData.name };
+    const params = { googleId: userData.googleId, name: userData.name, email: userData.email };
     const [result] = await connection.execute(sql, params);
-    return result.insertId;
+    const createdUser = await connection.execute('SELECT * FROM users WHERE userId = ?', [result.insertId]);
+    return createdUser[0];
   } catch (error) {
     throw error;
   }

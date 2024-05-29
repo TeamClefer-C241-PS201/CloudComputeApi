@@ -4,11 +4,10 @@ exports.up = async (knex) => {
   await knex.schema.createTable('users', (table) => {
     table.increments('userId').primary();
     table.string('googleId', 255);
-    table.string('firstName', 255).notNullable();
-    table.string('lastName', 255).notNullable();
-    table.string('userName', 255).notNullable();
-    table.string('email', 255).notNullable().unique();
-    table.string('password', 255).notNullable();
+    table.string('name', 255);
+    table.string('username',20).unique();
+    table.string('email', 255).unique();
+    table.string('password', 255);
     table.string('userPhoto', 255);
   });
 
