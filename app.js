@@ -10,6 +10,8 @@ require('dotenv').config();
 
 const app = express();
 
+app.use(express.json());
+
 // Connect to MySQL
 const connection = mysql.createConnection({
   host: process.env.DB_HOST,

@@ -25,7 +25,7 @@ passport.use(new GoogleStrategy({
   };
 
   try {
-    const user = await User.findOne(userData);
+    const user = await User.create(userData);
     // const user = await User.create(userData);
     return done(null, user);
   } catch (error) {
