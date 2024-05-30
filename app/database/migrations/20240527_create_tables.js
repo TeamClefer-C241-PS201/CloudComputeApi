@@ -9,6 +9,7 @@ exports.up = async (knex) => {
     table.string('email', 255).unique();
     table.string('password', 255);
     table.string('userPhoto', 255);
+    table.timestamp('createdAt').defaultTo(knex.fn.now());
   });
 
   await knex.schema.createTable('comments', (table) => {
