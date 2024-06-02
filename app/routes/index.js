@@ -6,7 +6,7 @@ const authController = require('../controllers/authController')
 
 // Development Purpose
 router.get('/', (req, res) => {
-  res.json({ message: 'Welcome to the API' });
+  res.json({ message: 'Welcome To the Api', user: req.user });
 });
 
 router.get('/failure', (req, res) => {
@@ -17,10 +17,7 @@ router.get('/failure', (req, res) => {
 // No Auth Required
 router.post('/register', authController.registerUser);
 
-router.get('/login', (req, res) => {
-  const message = req.query.message || '';
-  res.json({ message: 'login' });
-});
+router.post('/login', authController.login);
 
 router.get('/protected', ensureAuthenticated, (req, res) => {
   res.json({ message: 'This is a protected route', user: req.user });
