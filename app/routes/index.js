@@ -26,7 +26,8 @@ router.get('/protected', ensureAuthenticated, (req, res) => {
 
 router.post('/posts', postController.createPost);
 router.get('/posts', postController.getAllPosts);
-router.get('/:postId', postController.getPostById);
-router.delete('/:postId/delete', postController.deletePostById);
+router.get('/posts/:postId', postController.getPostById);
+router.delete('posts/:postId', postController.deletePostById);
 
+router.get('/posts/:postId')
 module.exports = router;

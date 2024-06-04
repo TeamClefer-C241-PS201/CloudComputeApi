@@ -4,7 +4,7 @@ const Post = require('../models/post');
 
 const createPost = async (req, res) => {
   try {
-    const userId = 1; // Misalnya, jika menggunakan sistem autentikasi
+    const userId = 2; // Misalnya, jika menggunakan sistem autentikasi
     const { postTitle, postDesc } = req.body;
     const postId = await Post.create(userId, postTitle, postDesc);
     res.status(201).json({ postId, userId, postTitle, postDesc });

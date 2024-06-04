@@ -11,22 +11,24 @@ exports.up = async (knex) => {
     table.string('userPhoto', 255);
     table.timestamp('createdAt').defaultTo(knex.fn.now());
   });
-
-  await knex.schema.createTable('comments', (table) => {
-    table.increments('commentId').primary();
-    table.string('postComment', 255).notNullable();
-  });
-
+  // Posts
   await knex.schema.createTable('posts', (table) => {
     table.increments('postId').primary();
     table.integer('userId').unsigned().notNullable();
     table.foreign('userId').references('userId').inTable('users');
-    table.integer('commentId').unsigned();
-    table.foreign('commentId').references('commentId').inTable('comments'); // Might be null
     table.string('postTitle', 255).notNullable();
     table.string('postDesc', 255).notNullable();
     table.string('postDate', 255).notNullable();
     table.integer('postLike').defaultTo(0);
+  });
+  // Comments
+  await knex.schema.createTable('comments', (table) => {
+    table.increments('commentId').primary();
+    table.integer('postId').unsigned().notNullable();
+    table.foreign('postId').references('postId').inTable('posts');
+    table.integer('userId').unsigned().notNullable();
+    table.foreign('userId').references('userId').inTable('users');
+    table.string('postComment', 255).notNullable();
   });
   // Articles table
   await knex.schema.createTable('articles', (table) => {
