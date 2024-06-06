@@ -45,7 +45,9 @@ const getClassification = async (model, image) => {
         }
         
         if (label === 'Healthy') {
-            suggestion = "Tanaman jagung anda sehat!.";
+            result = "Tanaman jagung anda sehat!."
+            description = "Tanaman jagung yang sehat memiliki beberapa ciri yang dapat diidentifikasi, salah satunya adalah dari daunnya. Daunnya berwarna hijau tua dan segar, tanpa tanda-tanda menguning atau bercak-bercak yang menunjukkan adanya penyakit. "
+            suggestion = "Untuk menjaga tanaman jagung tetap sehat, pilih benih berkualitas dan olah tanah dengan baik untuk memastikan kesuburan dan drainase yang baik. Lakukan pemupukan teratur, pengairan yang cukup, serta pengendalian gulma, hama, dan penyakit secara rutin. Selain itu, rotasi tanaman dianjurkan untuk mencegah penumpukan patogen di dalam tanah.  ";
         }
 
         return { label, result, description, suggestion };
