@@ -15,7 +15,17 @@ const Post = {
   getAll: async () => {
     try {
       const [rows] = await db.execute('SELECT * FROM posts');
-      return rows;
+      const postsWithLikers = await Promise.all(rows.map(async (posts) => {
+        const [likers] = await db.execute(
+          "SELECT COUNT(*) AS likerCount FROM likepost WHERE postId = ?",
+          [posts.postId]
+        );
+        return {
+          ...posts,
+          likerCount: likers[0].likerCount // Adding the liker count to the comment object
+        };
+      }));;
+      return postsWithLikers;
     } catch (error) {
       throw new Error(error.message);
     }
@@ -27,7 +37,17 @@ const Post = {
       if (rows.length === 0) {
         throw new Error('Post not found');
       }
-      return rows[0];
+      const postsWithLikers = await Promise.all(rows.map(async (posts) => {
+        const [likers] = await db.execute(
+          "SELECT COUNT(*) AS likerCount FROM likepost WHERE postId = ?",
+          [posts.postId]
+        );
+        return {
+          ...posts,
+          likerCount: likers[0].likerCount // Adding the liker count to the comment object
+        };
+      }));;
+      return postsWithLikers[0];
     } catch (error) {
       throw new Error(error.message);
     }
@@ -40,6 +60,14 @@ const Post = {
         throw new Error('Post not found');
       }
       return 'Post deleted successfully';
+    } catch (error) {
+      throw new Error(error.message);
+    }
+  },
+  like: async (userId, postId) => {
+    try {
+      const [result] = await db.execute('INSERT INTO likepost (userId, postId) VALUES (?, ?)', [userId, postId]);
+      return result.insertId;
     } catch (error) {
       throw new Error(error.message);
     }
