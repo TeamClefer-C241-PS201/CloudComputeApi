@@ -74,12 +74,15 @@ exports.login = async (req, res) => {
     if (!isMatch) {
       return res.status(401).json({ message: "Invalid email or password" });
     }
-
+    const userData = await connectionPool.query(
+      "SELECT * FROM users WHERE email = ?",
+      [email]
+    );
     // Create and sign JWT token
-    const payload = { userId: user.id }; // Include user ID in payload
+    const payload = { userId: user.userId }; // Include user ID in payload
     const token = jwt.sign(payload, "your_secret_key", { expiresIn: "1h" });
 
-    res.json({ token });
+    res.json({ email,token });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server Error" });
