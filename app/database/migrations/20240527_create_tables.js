@@ -15,7 +15,7 @@ exports.up = async (knex) => {
   await knex.schema.createTable("posts", (table) => {
     table.increments("postId").primary();
     table.integer("userId").unsigned().notNullable();
-    table.foreign("userId").references("userId").inTable("users");
+    table.foreign("userId").references("userId").inTable("users").onDelete("CASCADE");
     table.string("postTitle", 255).notNullable();
     table.string("postDesc", 255).notNullable();
     table.string("postDate", 255).notNullable();
@@ -25,9 +25,9 @@ exports.up = async (knex) => {
   await knex.schema.createTable("comments", (table) => {
     table.increments("commentId").primary();
     table.integer("postId").unsigned().notNullable();
-    table.foreign("postId").references("postId").inTable("posts");
+    table.foreign("postId").references("postId").inTable("posts").onDelete("CASCADE");
     table.integer("userId").unsigned().notNullable();
-    table.foreign("userId").references("userId").inTable("users");
+    table.foreign("userId").references("userId").inTable("users").onDelete("CASCADE");
     table.string("commentBody", 255).notNullable();
     table.string("commentDate", 255).notNullable();
   });
@@ -35,17 +35,17 @@ exports.up = async (knex) => {
   await knex.schema.createTable("likepost", (table) => {
     table.increments("postLikeId").primary();
     table.integer("postId").unsigned().notNullable();
-    table.foreign("postId").references("postId").inTable("posts");
+    table.foreign("postId").references("postId").inTable("posts").onDelete("CASCADE");
     table.integer("userId").unsigned().notNullable();
-    table.foreign("userId").references("userId").inTable("users");
+    table.foreign("userId").references("userId").inTable("users").onDelete("CASCADE");
   });
   // Comments Like
   await knex.schema.createTable("likecomment", (table) => {
     table.increments("commentLikeId").primary();
     table.integer("commentId").unsigned().notNullable();
-    table.foreign("commentId").references("commentId").inTable("comments");
+    table.foreign("commentId").references("commentId").inTable("comments").onDelete("CASCADE");
     table.integer("userId").unsigned().notNullable();
-    table.foreign("userId").references("userId").inTable("users");
+    table.foreign("userId").references("userId").inTable("users").onDelete("CASCADE");
   });
   // Articles table
   await knex.schema.createTable("articles", (table) => {
@@ -57,7 +57,7 @@ exports.up = async (knex) => {
   await knex.schema.createTable("diseases", (table) => {
     table.increments("diseaseId").primary();
     table.integer("articleId").unsigned().notNullable();
-    table.foreign("articleId").references("articleId").inTable("articles");
+    table.foreign("articleId").references("articleId").inTable("articles").onDelete("CASCADE");
     table.string("diseaseName", 255).notNullable();
     table.string("recommendation", 255);
   });
