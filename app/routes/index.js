@@ -8,7 +8,7 @@ const commentController = require('../controllers/commentController.js');
 
 // Development Purpose
 router.get('/', (req, res) => {
-  res.json({ message: 'Welcome To the Api', user: req.user });
+  res.json({ message: 'Welcome To the Api', user: req.user});
 });
 
 router.get('/failure', (req, res) => {
@@ -17,8 +17,7 @@ router.get('/failure', (req, res) => {
 // ----
 
 // No Auth Required
-router.post('/register', authController.registerUser);
-router.post('/login', authController.login);
+
 router.get('/protected', ensureAuthenticated, (req, res) => {
   res.json({ message: 'This is a protected route', user: req.user });
 });
@@ -37,4 +36,5 @@ router.delete('/:postId/:commentId/delete', commentController.deleteCommentById 
 //Like Posts & Comments
 router.post('/posts/:postId/like', postController.likePost);
 router.post('/posts/:postId/:commentId/like', commentController.likeComment);
+router.delete('/posts/:postId/:commentId/like', commentController.unlikeComment);
 module.exports = router;

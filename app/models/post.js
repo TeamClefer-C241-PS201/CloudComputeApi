@@ -74,4 +74,12 @@ const Post = {
   }
 };
 
+Post.associate = function(models) {
+  Post.hasMany(models.Comment, {
+    foreignKey: 'postId',
+    onDelete: 'CASCADE' 
+  });
+};
+
+
 module.exports = Post;
