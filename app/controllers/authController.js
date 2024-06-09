@@ -82,15 +82,20 @@ exports.login = async (req, res) => {
     if (!isMatch) {
       return res.status(401).json({ message: "Invalid password" });
     }
-    const userData = await connectionPool.query(
-      "SELECT username,name FROM users WHERE email = ?",
+    const [userdata] = await connectionPool.query(
+      "SELECT username, name FROM users WHERE email = ?",
       [email]
     );
-    console.log(userData);
+    console.log(userdata[0]);
+    const { username, name } = userdata[0];
+    console.log(username);
     // Create and sign JWT token
     const token = jwt.sign({userId: user.userId }, process.env.JWT_SECRET);
 
-    res.json({ email,token });
+    res.json({
+      message: "Welcome!", 
+      user: {name,username,email,token}
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server Error" });
