@@ -1,9 +1,10 @@
 // controllers/authController.js
-const { validationResult } = require("express-validator");
+const { body, validationResult } = require('express-validator');
 const connectionPool = require("../config/dbConfig");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { getUserByEmail } = require("../models/user");
+ 
 
 exports.logout = (req, res) => {
   req.logout();
@@ -17,6 +18,15 @@ exports.googleCallback = (req, res) => {
 };
 
 exports.registerUser = async (req, res) => {
+  const validationRules = [
+    body('name').notEmpty().withMessage('Name is required').isLength({ min: 5 }).withMessage('Name must be at least 5 characters long'),
+    body('username').notEmpty().withMessage('Username is required').isLength({ min: 5 }).withMessage('username must be at least 5 characters long'),
+    body('email').notEmpty().withMessage('Email is required').isEmail().withMessage('Invalid email format').isLength({ min: 5 }).withMessage('email must be at least 5 characters long'),
+    body('password').notEmpty().withMessage('Password is required').isLength({ min: 8 }).withMessage('Name must be at least 5 characters long')
+  ];
+
+  await Promise.all(validationRules.map(validation => validation.run(req)));
+
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
@@ -56,8 +66,6 @@ exports.registerUser = async (req, res) => {
     console.error(err);
     res.status(500).json({ message: "Server error" });
   }
-
-  
 };
 exports.login = async (req, res) => {
   try {
@@ -66,20 +74,28 @@ exports.login = async (req, res) => {
     // Find user by email
     const user = await getUserByEmail(email);
     if (!user) {
-      return res.status(401).json({ message: "Invalid email or password" });
+      return res.status(401).json({ message: "Invalid email" });
     }
 
     // Validate password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(401).json({ message: "Invalid email or password" });
+      return res.status(401).json({ message: "Invalid password" });
     }
-
+    const [userdata] = await connectionPool.query(
+      "SELECT username, name FROM users WHERE email = ?",
+      [email]
+    );
+    console.log(userdata[0]);
+    const { username, name } = userdata[0];
+    console.log(username);
     // Create and sign JWT token
-    const payload = { userId: user.id }; // Include user ID in payload
-    const token = jwt.sign(payload, "your_secret_key", { expiresIn: "1h" });
+    const token = jwt.sign({userId: user.userId }, process.env.JWT_SECRET);
 
-    res.json({ token });
+    res.json({
+      message: "Welcome!", 
+      user: {name,username,email,token}
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server Error" });

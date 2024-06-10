@@ -46,9 +46,21 @@ const likeComment = async (req, res) => {
     }
 };
 
+const unlikeComment = async (req, res) => {
+  try {
+    const userId = 2; //development purpose only using userId 2
+    const commentId = req.params.commentlikeId;
+      const commentLikeId = await Comment.unlike(commentId);
+      res.status(201).json({ commentLikeId, userId, commentId });
+    }catch (error) {
+      res.status(404).json({ message: error.message });
+    }
+};
+
 module.exports = {
   createComment,
   getCommentById,
   deleteCommentById,
   likeComment,
+  unlikeComment
 };
