@@ -5,6 +5,7 @@ const router = express.Router();
 const postController = require('../controllers/discusstionController.js');
 const authController = require('../controllers/authController');
 const commentController = require('../controllers/commentController.js');
+const articleController = require('../controllers/articleController');
 
 // Development Purpose
 router.get('/', (req, res) => {
@@ -38,3 +39,7 @@ router.delete('/:postId/:commentId/delete', commentController.deleteCommentById 
 router.post('/posts/:postId/like', postController.likePost);
 router.post('/posts/:postId/:commentId/like', commentController.likeComment);
 module.exports = router;
+
+//articles
+router.get('/articles', articleController.getAllArticles);
+router.get('/articles/:id', articleController.getArticleById);
