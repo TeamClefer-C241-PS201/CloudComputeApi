@@ -1,10 +1,11 @@
-const express = require('express');
+const express = require("express");
 const app = express();
-const Post = require('../models/post');
+const Post = require("../models/post");
+
 
 const createPost = async (req, res) => {
   try {
-    const userId = 1; // Misalnya, jika menggunakan sistem autentikasi
+    const userId = 2; //development purpose only using userId 2
     const { postTitle, postDesc } = req.body;
     const postId = await Post.create(userId, postTitle, postDesc);
     res.status(201).json({ postId, userId, postTitle, postDesc });
@@ -42,4 +43,15 @@ const deletePostById = async (req, res) => {
   }
 };
 
-module.exports = { createPost, getAllPosts, getPostById, deletePostById };
+const likePost = async (req, res) => {
+  try {
+    const userId = 2; //development purpose only using userId 2
+    const postId = req.params.postId;
+    const postLikeId = await Post.like(userId, postId);
+    res.status(201).json({ postLikeId, userId, postId});
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+module.exports = { createPost, getAllPosts, getPostById, deletePostById, likePost};

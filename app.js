@@ -12,6 +12,7 @@ require('dotenv').config();
 
 const app = express();
 
+// Middleware to parse JSON
 app.use(express.json());
 
 // Connect to MySQL

@@ -1,55 +1,40 @@
 // routes/index.js
 const express = require('express');
-const ensureAuthenticated = require('../middleware/ensureAuthenticate.js');
+const ensureAuthenticated = require('../middleware/ensureAuthenticate');
 const router = express.Router();
 const postController = require('../controllers/discusstionController.js');
-// const postPredict = require('../controllers/predictController.js');
+const authController = require('../controllers/authController');
+const commentController = require('../controllers/commentController.js');
 
+// Development Purpose
 router.get('/', (req, res) => {
-  res.json({ message: 'Welcome to the API' });
+  res.json({ message: 'Welcome To the Api', user: req.user });
 });
 
+router.get('/failure', (req, res) => {
+  res.json({ message: 'your login callback fail' });
+});
+// ----
+
+// No Auth Required
+router.post('/register', authController.registerUser);
+router.post('/login', authController.login);
 router.get('/protected', ensureAuthenticated, (req, res) => {
   res.json({ message: 'This is a protected route', user: req.user });
 });
 
+//Post
 router.post('/posts', postController.createPost);
 router.get('/posts', postController.getAllPosts);
 router.get('/posts/:postId', postController.getPostById);
 router.delete('/:postId/delete', postController.deletePostById);
 
-// router.post('/predict', postPredict.getPredictions);
+//Comments
+router.post('/posts/:postId/comments/create', commentController.createComment);
+router.get('/posts/:postId/comments/', commentController.getCommentById );
+router.delete('/:postId/:commentId/delete', commentController.deleteCommentById );
 
-// router.post('/predict', async (req, res) => {
-//   const { image } = req.body; // Assuming the image is sent in the body. Adjust this as per your requirement.
-//   const { model } = req.app.locals; // Assuming the model is stored in app locals.
-
-//   try {
-//       const { label, suggestion } = await predictClassification(model, image);
-//       const id = crypto.randomUUID();
-//       const createdAt = new Date().toISOString();
-
-//       const data = {
-//           id,
-//           result: label,
-//           suggestion,
-//           createdAt
-//       };
-
-//       // // Store data in Firestore
-//       // await db.collection('prediction').doc(id).set(data);
-
-//       res.status(201).json({
-//           status: 'success',
-//           message: 'Model is predicted successfully',
-//           data
-//       });
-//   } catch (error) {
-//       res.status(500).json({
-//           status: 'error',
-//           message: error.message
-//       });
-//   }
-// });
-
+//Like Posts & Comments
+router.post('/posts/:postId/like', postController.likePost);
+router.post('/posts/:postId/:commentId/like', commentController.likeComment);
 module.exports = router;

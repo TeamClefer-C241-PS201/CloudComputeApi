@@ -4,11 +4,13 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const User = require('../models/user');
 const session = require('express-session');
 const express = require('express');
-const connectionPool = require('../config/dbConfig')
+const connectionPool = require('../config/dbConfig');
+
 
 const app = express();
 
 app.use(session({
+  maxAge: 24 * 60 * 60 * 1000,
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: true
@@ -22,10 +24,12 @@ passport.use(new GoogleStrategy({
   const userData = {
     googleId: profile.id,
     name: profile.displayName,
+    email: profile.email,
   };
 
   try {
-    const user = await User.create(userData);
+    console.log(userData);
+    const user = await User.findOne(userData);
     // const user = await User.create(userData);
     return done(null, user);
   } catch (error) {
@@ -36,7 +40,7 @@ passport.use(new GoogleStrategy({
 
 passport.serializeUser((user, done) => {
   console.log("Serializing user:", user);  // Optional log for debugging
-  done(null, user.userId); // Replace with "user.id" if that's your property name
+  done(null, user.userId); 
 });
 
 passport.deserializeUser(async (userId, done) => {
@@ -50,6 +54,7 @@ passport.deserializeUser(async (userId, done) => {
   }
 });
 
+//initialize passport
 app.use(passport.initialize());
 app.use(passport.session());
 
