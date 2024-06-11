@@ -46,9 +46,10 @@ const likeComment = async (req, res) => {
     }
 };
 
+
 module.exports = {
   createComment,
   getCommentById,
   deleteCommentById,
-  likeComment,
+  likeComment
 };

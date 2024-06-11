@@ -64,11 +64,25 @@ User.create = async (userData) => {
   try {
     console.log(userData);
     const sql =
-      "INSERT INTO users ( googleId, name) VALUES ( :googleId, :name)";
-    const params = { googleId: userData.googleId, name: userData.name };
-    const result = await connection.execute(sql, params);
-    const insertId = result.insertId;
-    return new User(insertId, userData.googleId, userData.name);
+      "INSERT INTO users ( googleId, name,email) VALUES ( :googleId, :name, :email)";
+    const params = { googleId: userData.googleId, name: userData.name, email:userData.email };
+    await connection.execute(sql, params);
+    return User.findOne(userData);
+  } catch (error) {
+    throw error;
+  }
+};
+
+User.edit = async (userId, name, username, email, userPhoto) => {
+  try {
+    const query = `
+      UPDATE users 
+      SET name = ?, username = ?, email = ?,  userPhoto = ?
+      WHERE userId = ?
+    `;
+    const [result] = await connection.execute(query, [ name, username, email, userPhoto, userId]);
+    console.log(result)
+    return result;
   } catch (error) {
     throw error;
   }

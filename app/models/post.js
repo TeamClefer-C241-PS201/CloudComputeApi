@@ -66,12 +66,25 @@ const Post = {
   },
   like: async (userId, postId) => {
     try {
-      const [result] = await db.execute('INSERT INTO likepost (userId, postId) VALUES (?, ?)', [userId, postId]);
+      const [like] = await db.execute("Select postLikeId FROM likepost where userId= ? AND postId = ?",[userId,postId]);
+      const firstlike = like[0]
+      if(like.length > 0){
+        await db.execute(
+          "DELETE FROM likepost WHERE postLikeId = ?",
+          [firstlike.postLikeId]
+        );
+        return "Unlike Post!";
+      }
+      const [result] = await db.execute(
+        "INSERT INTO likepost (userId, postId) VALUES (?, ?)",
+        [userId, postId]
+      );
       return result.insertId;
     } catch (error) {
       throw new Error(error.message);
     }
   }
 };
+
 
 module.exports = Post;
