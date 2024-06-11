@@ -56,25 +56,20 @@ const Comment = {
   },
   like: async (userId, commentId) => {
     try {
+      const [like] = await db.execute("Select commentLikeId FROM likecomment where userId= ? AND commentId = ?",[userId,commentId])
+      const firstlike = like[0]
+      if(like.length > 0){
+        await db.execute(
+          "DELETE FROM likecomment WHERE commentLikeId = ?",
+          [firstlike.commentLikeId]
+        );
+        return "Unlike Post!";
+      }
       const [result] = await db.execute(
         "INSERT INTO likecomment (userId, commentId) VALUES (?, ?)",
         [userId, commentId]
       );
       return result.insertId;
-    } catch (error) {
-      throw new Error(error.message);
-    }
-  },
-  unlike: async (commentLikeId) => {
-    try {
-      const [result] = await db.execute(
-        "DELETE FROM likecomment WHERE commentLikeId = ?",
-        [commentLikeId]
-      );
-      if (result.affectedRows === 0) {
-        throw new Error("Comment not found");
-      }
-      return "Comment Deleted Succesfully";
     } catch (error) {
       throw new Error(error.message);
     }
