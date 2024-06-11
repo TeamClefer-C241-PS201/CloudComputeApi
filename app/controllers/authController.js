@@ -4,7 +4,7 @@ const connectionPool = require("../config/dbConfig");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { getUserByEmail } = require("../models/user");
- 
+const User = require("../models/user");
 
 exports.logout = (req, res) => {
   req.logout();
@@ -99,5 +99,23 @@ exports.login = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server Error" });
+  }
+};
+
+exports.edit = async (req, res) => {
+  const {name, username, email, userPhoto } = req.body;
+  const userId = 2; // Assuming req.user contains the authenticated user's data
+
+  try {
+    console.log({name, username, email, userPhoto,userId });
+    const result = await User.edit(userId, name, username, email, userPhoto);
+    if (result.affectedRows > 0) {
+      res.status(200).json({ message: 'User updated successfully' });
+    } else {
+      res.status(404).json({ message: 'User not found' });
+    }
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({ message: 'Server error' });
   }
 };
