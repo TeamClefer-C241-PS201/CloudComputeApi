@@ -3,6 +3,9 @@ const mysql = require("mysql2/promise");
 const connection = require("../config/dbConfig");
 const bcrypt = require("bcrypt");
 const { use } = require("passport");
+const { Storage } = require("@google-cloud/storage");
+const Multer = require("multer");
+const { bucket } = require('../config/storage');
 
 class User {
   constructor(userId, googleId, name, username, email, password, photo) {
@@ -83,6 +86,26 @@ User.edit = async (userId, name, username, email, userPhoto) => {
     const [result] = await connection.execute(query, [ name, username, email, userPhoto, userId]);
     console.log(result)
     return result;
+  } catch (error) {
+    throw error;
+  }
+};
+
+User.uploadPhoto = async (userId, file) => {
+  try {
+    const blob = bucket.file(`profilePhoto/${userId}-${file.originalname}`);
+    const blobStream = blob.createWriteStream({
+      resumable: false,
+    });
+
+    return new Promise((resolve, reject) => {
+      blobStream.on('finish', () => {
+        const publicUrl = `https://storage.googleapis.com/${bucket.name}/${blob.name}`;
+        resolve(publicUrl);
+      }).on('error', (err) => {
+        reject(err);
+      }).end(file.buffer);
+    });
   } catch (error) {
     throw error;
   }
