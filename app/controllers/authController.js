@@ -5,6 +5,9 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { getUserByEmail } = require("../models/user");
 const User = require("../models/user");
+const multer = require('multer');
+const upload = multer({ storage: multer.memoryStorage() }).single('userPhoto');
+
 
 exports.logout = (req, res) => {
   req.logout();
@@ -90,7 +93,7 @@ exports.login = async (req, res) => {
     const { username, name } = userdata[0];
     console.log(username);
     // Create and sign JWT token
-    const token = jwt.sign({userId: user.userId }, process.env.JWT_SECRET);
+    const token = jwt.sign({userId: user.userId, name: user.name, username: user.username, email: user.email }, process.env.JWT_SECRET);
 
     res.json({
       message: "Welcome!", 
@@ -103,19 +106,32 @@ exports.login = async (req, res) => {
 };
 
 exports.edit = async (req, res) => {
-  const {name, username, email, userPhoto } = req.body;
-  const userId = 2; // Assuming req.user contains the authenticated user's data
-
-  try {
-    console.log({name, username, email, userPhoto,userId });
-    const result = await User.edit(userId, name, username, email, userPhoto);
-    if (result.affectedRows > 0) {
-      res.status(200).json({ message: 'User updated successfully' });
-    } else {
-      res.status(404).json({ message: 'User not found' });
+  upload(req, res, async (err) => {
+    if (err) {
+      return res.status(500).json({ message: 'Error uploading file' });
     }
-  } catch (error) {
-    console.error(error.message);
-    res.status(500).json({ message: 'Server error' });
-  }
+
+    const { name, username, email } = req.body;
+    const userId = 2; // development purpost
+
+    try {
+      let userPhotoUrl = null;
+
+      if (req.file) {
+        userPhotoUrl = await User.uploadPhoto(userId, req.file);
+      }
+
+      console.log({ name, username, email, userPhoto: userPhotoUrl, userId });
+      const result = await User.edit(userId, name, username, email, userPhotoUrl);
+
+      if (result.affectedRows > 0) {
+        res.status(200).json({ message: 'User updated successfully' });
+      } else {
+        res.status(404).json({ message: 'User not found' });
+      }
+    } catch (error) {
+      console.error(error.message);
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
 };
