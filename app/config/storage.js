@@ -8,7 +8,7 @@ const storage = new Storage({
 });
 
 // Reference to your storage bucket
-const bucketName = 'cleferdev/photo';
+const bucketName = 'cleferdev';
 const bucket = storage.bucket(bucketName);
 
 module.exports = { bucket };
