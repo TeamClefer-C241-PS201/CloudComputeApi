@@ -37,7 +37,5 @@ router.delete('/:postId/:commentId/delete', commentController.deleteCommentById 
 router.post('/posts/:postId/like', postController.likePost);
 router.post('/posts/:postId/:commentId/like', commentController.likeComment);
 
-//upload photos
-router.get("/upload", authController.uploadPhoto);
 
 module.exports = router;
