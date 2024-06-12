@@ -1,7 +1,7 @@
 // controllers/authController.js
 const { body, validationResult } = require('express-validator');
 const connectionPool = require("../config/dbConfig");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { getUserByEmail } = require("../models/user");
 const User = require("../models/user");
