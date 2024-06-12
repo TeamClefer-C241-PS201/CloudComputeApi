@@ -1,7 +1,7 @@
 // models/user.js
 const mysql = require("mysql2/promise");
 const connection = require("../config/dbConfig");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const { use } = require("passport");
 const { Storage } = require("@google-cloud/storage");
 const Multer = require("multer");
