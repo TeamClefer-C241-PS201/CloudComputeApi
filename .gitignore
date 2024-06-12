@@ -1,3 +1,4 @@
 node_modules
+.package-lock.json
 .env
 clefer-423408-a99ea75ab7b6.json
