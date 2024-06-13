@@ -78,6 +78,13 @@ User.create = async (userData) => {
 
 User.edit = async (userId, name, username, email, userPhoto) => {
   try {
+        // Replace undefined values with null
+        googleId = googleId || null;
+        name = name || null;
+        username = username || null;
+        email = email || null;
+        userPhoto = userPhoto || null;
+
     const query = `
       UPDATE users 
       SET name = ?, username = ?, email = ?,  userPhoto = ?

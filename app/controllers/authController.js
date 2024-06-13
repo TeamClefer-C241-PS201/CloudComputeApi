@@ -135,3 +135,30 @@ exports.edit = async (req, res) => {
     }
   });
 };
+
+exports.googleSignInAndroid = async (req, res) => {
+  const idToken = req.body.idToken;
+
+  try {
+    const ticket = await client.verifyIdToken({
+      idToken,
+      audience: process.env.GOOGLE_CLIENT_ID_ANDROID
+    });
+    const payload = ticket.getPayload();
+    const userData = {
+      googleId: payload.sub,
+      name: payload.name,
+      email: payload.email,
+    };
+
+    const user = await User.findOne(userData);
+    const token = jwt.sign({ userId: user.userId, name: user.name, username: user.username, email: user.email }, process.env.JWT_SECRET);
+
+    res.json({
+      message: 'Successfully authenticated',
+      user: { name: user.name, username: user.username, email: user.email, token }
+    });
+  } catch (error) {
+    res.status(400).json({ error: 'Invalid token' });
+  }
+};

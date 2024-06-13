@@ -9,11 +9,21 @@ const predictRoutes = require('./app/routes/predictRoutes');
 const mysql = require('mysql2');
 const loadModel = require('./loadModel');
 require('dotenv').config();
+const bodyParser = require('body-parser');
+const multer = require('multer');
 
 const app = express();
 
+// Middleware to parse x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+
+
 // Middleware to parse JSON
 app.use(express.json());
+
+// Middleware for handling multipart/form-data
+const upload = multer({ storage: multer.memoryStorage() });
 
 // Connect to MySQL
 const connection = mysql.createConnection({
@@ -31,8 +41,9 @@ connection.connect((err) => {
   console.log('Connected to MySQL');
 });
 
-// Configure session middleware
+// Session setup
 app.use(session({
+  maxAge: 24 * 60 * 60 * 1000,
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: true
