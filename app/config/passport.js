@@ -51,6 +51,38 @@ passport.use(new GoogleStrategy({
   }
 }));
 
+passport.use('google-android', new GoogleStrategy({
+  clientID: process.env.GOOGLE_CLIENT_ID_ANDROID,
+  clientSecret: '',
+  callbackURL: '',
+}, async (accessToken, refreshToken, profile, done) => {
+  try {
+    const { data } = await axios.get('https://www.googleapis.com/oauth2/v2/userinfo', {
+      headers: {
+        Authorization: `Bearer ${accessToken}`
+      }
+    });
+    const userData = {
+      googleId: profile.id,
+      name: profile.displayName,
+      email: data.email,
+    };
+
+    try {
+      const user = await User.findOne(userData);
+      user.accessToken = accessToken;
+      user.refreshToken = refreshToken;
+      return done(null, user);
+    } catch (error) {
+      console.error("Error creating user:", error);
+      return done(error);
+    }
+  } catch (error) {
+    console.error("Error fetching user data from Google:", error);
+    done(error);
+  }
+}));
+
 passport.serializeUser((user, done) => {
   console.log("Serializing user:", user);  // Optional log for debugging
   done(null, user.userId); 
