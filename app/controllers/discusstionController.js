@@ -5,7 +5,7 @@ const Post = require("../models/post");
 
 const createPost = async (req, res) => {
   try {
-    const userId = 2; //development purpose only using userId 2
+    const userId = req.user.userId;
     const { postTitle, postDesc } = req.body;
     const postId = await Post.create(userId, postTitle, postDesc);
     res.status(201).json({ postId, userId, postTitle, postDesc });
@@ -45,7 +45,7 @@ const deletePostById = async (req, res) => {
 
 const likePost = async (req, res) => {
   try {
-    const userId = 2; //development purpose only using userId 2
+    const userId = req.user.userId;
     const postId = req.params.postId;
     const postLikeId = await Post.like(userId, postId);
     res.status(201).json({ postLikeId, userId, postId});

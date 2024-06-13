@@ -25,7 +25,7 @@ exports.registerUser = async (req, res) => {
     body('name').notEmpty().withMessage('Name is required').isLength({ min: 5 }).withMessage('Name must be at least 5 characters long'),
     body('username').notEmpty().withMessage('Username is required').isLength({ min: 5 }).withMessage('username must be at least 5 characters long'),
     body('email').notEmpty().withMessage('Email is required').isEmail().withMessage('Invalid email format').isLength({ min: 5 }).withMessage('email must be at least 5 characters long'),
-    body('password').notEmpty().withMessage('Password is required').isLength({ min: 8 }).withMessage('Name must be at least 5 characters long')
+    body('password').notEmpty().withMessage('Password is required').isLength({ min: 8 }).withMessage('Password must be at least 8 characters long')
   ];
 
   await Promise.all(validationRules.map(validation => validation.run(req)));
@@ -77,7 +77,7 @@ exports.login = async (req, res) => {
     // Find user by email
     const user = await getUserByEmail(email);
     if (!user) {
-      return res.status(401).json({ message: "Invalid email" });
+      return res.status(401).json({ message: "email is not registered yet" });
     }
 
     // Validate password
@@ -86,11 +86,11 @@ exports.login = async (req, res) => {
       return res.status(401).json({ message: "Invalid password" });
     }
     const [userdata] = await connectionPool.query(
-      "SELECT username, name FROM users WHERE email = ?",
+      "SELECT * FROM users WHERE email = ?",
       [email]
     );
     console.log(userdata[0]);
-    const { username, name } = userdata[0];
+    const { userId,username, name } = userdata[0];
     console.log(username);
     // Create and sign JWT token
     const token = jwt.sign({userId: user.userId, name: user.name, username: user.username, email: user.email }, process.env.JWT_SECRET);

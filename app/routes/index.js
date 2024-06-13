@@ -23,19 +23,19 @@ router.get('/protected', ensureAuthenticated, (req, res) => {
 });
 
 //Post
-router.post('/posts', postController.createPost);
+router.post('/posts', ensureAuthenticated,postController.createPost);
 router.get('/posts', postController.getAllPosts);
-router.get('/posts/:postId', postController.getPostById);
-router.delete('/:postId/delete', postController.deletePostById);
+router.get('/posts/:postId',ensureAuthenticated, postController.getPostById);
+router.delete('/:postId/delete',ensureAuthenticated, postController.deletePostById);
 
 //Comments
-router.post('/posts/:postId/comments/create', commentController.createComment);
-router.get('/posts/:postId/comments/', commentController.getCommentById );
-router.delete('/:postId/:commentId/delete', commentController.deleteCommentById );
+router.post('/posts/:postId/comments/create',ensureAuthenticated, commentController.createComment);
+router.get('/posts/:postId/comments/',ensureAuthenticated, commentController.getCommentById );
+router.delete('/:postId/:commentId/delete',ensureAuthenticated, commentController.deleteCommentById );
 
 //Like Posts & Comments
-router.post('/posts/:postId/like', postController.likePost);
-router.post('/posts/:postId/:commentId/like', commentController.likeComment);
+router.post('/posts/:postId/like',ensureAuthenticated, postController.likePost);
+router.post('/posts/:postId/:commentId/like',ensureAuthenticated, commentController.likeComment);
 
 
 module.exports = router;

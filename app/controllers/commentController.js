@@ -5,7 +5,7 @@ const Comment = require("../models/comment.js");
 
 const createComment = async (req, res) => {
   try {
-    const userId = 2; //development purpose only using userId 2
+    const userId = req.user.userId;
     const postId = req.params.postId;
     const { commentBody } = req.body;
     const commentId = await Comment.create(userId, postId, commentBody);
@@ -37,7 +37,7 @@ const deleteCommentById = async (req, res) => {
 
 const likeComment = async (req, res) => {
   try {
-    const userId = 2; //development purpose only using userId 2
+    const userId = req.user.userId;
     const commentId = req.params.commentId;
       const commentLikeId = await Comment.like(userId, commentId);
       res.status(201).json({ commentLikeId, userId, commentId });
