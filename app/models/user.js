@@ -1,7 +1,7 @@
 // models/user.js
 const mysql = require("mysql2/promise");
 const connection = require("../config/dbConfig");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const { use } = require("passport");
 const { Storage } = require("@google-cloud/storage");
 const Multer = require("multer");
@@ -78,6 +78,13 @@ User.create = async (userData) => {
 
 User.edit = async (userId, name, username, email, userPhoto) => {
   try {
+        // Replace undefined values with null
+        googleId = googleId || null;
+        name = name || null;
+        username = username || null;
+        email = email || null;
+        userPhoto = userPhoto || null;
+
     const query = `
       UPDATE users 
       SET name = ?, username = ?, email = ?,  userPhoto = ?
