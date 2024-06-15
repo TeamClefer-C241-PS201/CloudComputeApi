@@ -20,9 +20,14 @@ const Post = {
           "SELECT COUNT(*) AS likerCount FROM likepost WHERE postId = ?",
           [posts.postId]
         );
+        const [comments] = await db.execute(
+          "SELECT COUNT(*) AS commentCount FROM comments where postId =?",
+          [posts.postId]
+        );
         return {
           ...posts,
-          likerCount: likers[0].likerCount // Adding the liker count to the comment object
+          likerCount: likers[0].likerCount, // Adding the liker count to the comment object
+          commentCount: comments[0].commentCount // Adding comment count
         };
       }));;
       return postsWithLikers;
@@ -42,9 +47,14 @@ const Post = {
           "SELECT COUNT(*) AS likerCount FROM likepost WHERE postId = ?",
           [posts.postId]
         );
+        const [comments] = await db.execute(
+          "SELECT COUNT(*) AS commentCount FROM comments where postId =?",
+          [posts.postId]
+        );
         return {
           ...posts,
-          likerCount: likers[0].likerCount // Adding the liker count to the comment object
+          likerCount: likers[0].likerCount, // Adding the liker count to the comment object
+          commentCount: comments[0].commentCount // Adding comment count
         };
       }));;
       return postsWithLikers[0];
