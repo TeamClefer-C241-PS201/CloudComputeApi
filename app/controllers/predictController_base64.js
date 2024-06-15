@@ -60,7 +60,7 @@ const getPredictions = async (req, res) => {
         const { model } = req.app.locals; // Assuming the model is stored in app locals.
 
         if (!base64Image) {
-            return res.status(400).json({ status: 'error', message: 'Data Gambar Diperlukan' });
+            return res.status(400).json({error:true, status: 'error', message: 'Data Gambar Diperlukan' });
         }
 
         // Decode base64 to buffer
@@ -84,7 +84,7 @@ const getPredictions = async (req, res) => {
         const [articles] = await db.execute('SELECT * from articles WHERE articleId=?', [articleId]);
 
         if (!articles) {
-            return res.status(404).json({ status: 'error', message: 'Article not found' });
+            return res.status(404).json({error:true, status: 'error', message: 'Article not found' });
         }
 
         const article = articles[0];
@@ -100,13 +100,13 @@ const getPredictions = async (req, res) => {
             createdAt
         };
 
-        res.status(201).json({
+        res.status(201).json({error:false,
             status: 'success',
             message: 'Model is predicted successfully',
             data
         });
     } catch (error) {
-        res.status(500).json({
+        res.status(500).json({error:true,
             status: 'error',
             message: error.message
         });
