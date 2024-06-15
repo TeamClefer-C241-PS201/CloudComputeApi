@@ -9,7 +9,7 @@ module.exports = (req, res, next) => {
   // Check if there is a token in the request header
   const token = req.header('token-auth');
   if (!token) {
-    return res.status(401).json({ message: 'This is a protected route', user: req.user });
+    return res.status(401).json({error:true, message: 'This is a protected route'});
   }
 
   // Verify the JWT token
@@ -18,6 +18,6 @@ module.exports = (req, res, next) => {
     req.user = verified;
     next();
   } catch (err) {
-    res.status(400).json({ message: 'Invalid Token' });
+    res.status(400).json({error:true, message: 'Invalid Token' });
   }
 };

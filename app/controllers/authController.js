@@ -67,7 +67,7 @@ exports.registerUser = async (req, res) => {
       });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({error:true, message: "Server error" });
   }
 };
 exports.login = async (req, res) => {
@@ -77,13 +77,13 @@ exports.login = async (req, res) => {
     // Find user by email
     const user = await getUserByEmail(email);
     if (!user) {
-      return res.status(401).json({ message: "Invalid email" });
+      return res.status(401).json({error:true, message: "Invalid email" });
     }
 
     // Validate password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(401).json({ message: "Invalid password" });
+      return res.status(401).json({error:true, message: "Invalid password" });
     }
     const [userdata] = await connectionPool.query(
       "SELECT username, name FROM users WHERE email = ?",
@@ -95,13 +95,13 @@ exports.login = async (req, res) => {
     // Create and sign JWT token
     const token = jwt.sign({userId: user.userId, name: user.name, username: user.username, email: user.email }, process.env.JWT_SECRET);
 
-    res.json({
+    res.json({error:false,
       message: "Welcome!", 
       user: {name,username,email,token}
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Server Error" });
+    res.status(500).json({error:true, message: "Server Error" });
   }
 };
 
