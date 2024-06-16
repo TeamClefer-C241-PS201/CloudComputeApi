@@ -15,7 +15,7 @@ const Post = {
   getAll: async () => {
     try {
       const [rows] = await db.execute(
-        "SELECT p.*, COALESCE(l.likeCount, 0) AS LikerCount, COALESCE(ls.likeStatus, 0) AS likeStat, COALESCE(c.commentCount, 0) AS commentCount FROM posts p LEFT JOIN (SELECT postId, COUNT(*) as likeCount FROM likepost GROUP BY postId) l ON p.postId = l.postId LEFT JOIN (SELECT postId, 1 AS likeStatus FROM likepost where userId = 2) ls ON p.postId = ls.postId LEFT JOIN (SELECT postId, COUNT(*) as commentCount FROM comments GROUP BY postId) c ON c.postID = p.postId",
+        "SELECT p.*, COALESCE(l.likeCount, 0) AS LikerCount, COALESCE(ls.likeStatus, 0) AS likeStat, COALESCE(c.commentCount, 0) AS commentCount, u.name FROM posts p LEFT JOIN (SELECT postId, COUNT(*) as likeCount FROM likepost GROUP BY postId) l ON p.postId = l.postId LEFT JOIN (SELECT postId, 1 AS likeStatus FROM likepost WHERE userId = 2) ls ON p.postId = ls.postId LEFT JOIN (SELECT postId, COUNT(*) as commentCount FROM comments GROUP BY postId) c ON c.postId = p.postId LEFT JOIN (SELECT userId, name FROM users WHERE userId = 2) u ON p.userId = u.userId",
       )//[users.userId];
       return rows;
     } catch (error) {
@@ -25,7 +25,7 @@ const Post = {
 
   getById: async (postId) => {
     try {
-      const [rows] = await db.execute('SELECT * FROM posts WHERE postId = ?', [postId]);
+      const [rows] = await db.execute('SELECT p.userId, postId, postTitle, postDesc, postDate, name, createdAt FROM posts p LEFT JOIN users u on p.userId = u.userId WHERE postId = ?', [postId]);
       if (rows.length === 0) {
         throw new Error('Post not found');
       }
