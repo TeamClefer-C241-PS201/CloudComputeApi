@@ -45,7 +45,7 @@ const Post = {
 
   getById: async (postId) => {
     try {
-      const [rows] = await db.execute('SELECT * FROM posts p WHERE postId = ?', [postId]);
+      const [rows] = await db.execute('SELECT p.userId, postId, postTitle, postDesc, postDate, name, createdAt FROM posts p LEFT JOIN users u on p.userId = u.userId WHERE postId = ?', [postId]);
       if (rows.length === 0) {
         throw new Error('Post not found');
       }
