@@ -4,7 +4,7 @@ const connection = require("../config/dbConfig");
 const bcrypt = require("bcryptjs");
 const { use } = require("passport");
 const { Storage } = require("@google-cloud/storage");
-const Multer = require("multer");
+const multer = require("multer");
 const { bucket } = require('../config/storage');
 
 class User {
@@ -78,21 +78,20 @@ User.create = async (userData) => {
 
 User.edit = async (userId, name, username, email, userPhoto) => {
   try {
-        // Replace undefined values with null
-        googleId = googleId || null;
-        name = name || null;
-        username = username || null;
-        email = email || null;
-        userPhoto = userPhoto || null;
+    // Ensure optional parameters are defaulted to null if not provided
+    name = name || null;
+    username = username || null;
+    email = email || null;
+    userPhoto = userPhoto || null;
 
     const query = `
       UPDATE users 
-      SET name = ?, username = ?, email = ?,  userPhoto = ?
+      SET name = ?, username = ?, email = ?, userPhoto = ?
       WHERE userId = ?
     `;
-    const [result] = await connection.execute(query, [ name, username, email, userPhoto, userId]);
-    console.log(result)
-    return result;
+    const [result] = await connection.execute(query, [name, username, email, userPhoto, userId]);
+    
+    return result; // Return the result of the update operation
   } catch (error) {
     throw error;
   }
