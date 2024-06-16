@@ -21,8 +21,8 @@ class User {
   static async create(googleId, name, username, email, password, photo) {
     const hashedPassword = await hashPassword(password); // Implement password hashing
     const [results] = await pool.execute(
-      "INSERT INTO users (googleId, name, username, email, password, photo) VALUES (?, ?, ?, ?, ?, ?)",
-      [googleId, name, username, email, hashedPassword, photo]
+      "INSERT INTO users (googleId, name, username, email, password, userPhoto) VALUES (?, ?, ?, ?, ?, ?)",
+      [googleId, name, username, email, hashedPassword, userPhoto]
     );
     return new User(
       results.insertId,
@@ -31,7 +31,7 @@ class User {
       username,
       email,
       hashedPassword,
-      photo
+      userPhoto
     );
   }
 
