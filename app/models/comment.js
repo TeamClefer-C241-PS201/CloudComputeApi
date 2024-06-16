@@ -18,7 +18,7 @@ const Comment = {
   getComment: async (postId) => {
     try {
       const [rows] = await db.execute(
-        "SELECT * FROM comments WHERE postId = ?",
+        "SELECT c.userId, commentId, postId, commentBody, commentDate, name, createdAt FROM comments c LEFT JOIN users u on c.userId = u.userId WHERE postId = ?",
         [postId]
       );
       if (rows.length === 0) {
