@@ -33,7 +33,7 @@ exports.registerUser = async (req, res) => {
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
+    return res.status(400).json({ error:true,errors: errors.array() });
   }
 
   const { name, username, email, password } = req.body;
@@ -49,7 +49,7 @@ exports.registerUser = async (req, res) => {
     if (existingUser[0].length > 0) {
       return res
         .status(400)
-        .json({ message: "Username or email already exists" });
+        .json({error:true,message: "Username or email already exists" });
     }
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
@@ -61,13 +61,13 @@ exports.registerUser = async (req, res) => {
 
     res
       .status(201)
-      .json({
+      .json({error:false,
         message: "User created successfully",
         user: { username, email },
       });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({error:true, message: "Server error" });
   }
 };
 exports.login = async (req, res) => {
@@ -83,7 +83,7 @@ exports.login = async (req, res) => {
     // Validate password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(401).json({ message: "Invalid password" });
+      return res.status(401).json({error:true, message: "Invalid password" });
     }
     const [userdata] = await connectionPool.query(
       "SELECT * FROM users WHERE email = ?",
@@ -95,20 +95,20 @@ exports.login = async (req, res) => {
     // Create and sign JWT token
     const token = jwt.sign({userId: user.userId, name: user.name, username: user.username, email: user.email }, process.env.JWT_SECRET);
 
-    res.json({
+    res.json({error:false,
       message: "Welcome!", 
       user: {name,username,email,token}
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Server Error" });
+    res.status(500).json({error:true, message: "Server Error" });
   }
 };
 
 exports.edit = async (req, res) => {
   upload(req, res, async (err) => {
     if (err) {
-      return res.status(500).json({ message: 'Error uploading file' });
+      return res.status(500).json({error:true, message: 'Error uploading file' });
     }
 
     const { name, username, email } = req.body;
@@ -125,13 +125,13 @@ exports.edit = async (req, res) => {
       const result = await User.edit(userId, name, username, email, userPhotoUrl);
 
       if (result.affectedRows > 0) {
-        res.status(200).json({ message: 'User updated successfully' });
+        res.status(200).json({error:false, message: 'User updated successfully' });
       } else {
-        res.status(404).json({ message: 'User not found' });
+        res.status(404).json({error:true, message: 'User not found' });
       }
     } catch (error) {
       console.error(error.message);
-      res.status(500).json({ message: 'Server error' });
+      res.status(500).json({error:true, message: 'Server error' });
     }
   });
 };
@@ -154,11 +154,11 @@ exports.googleSignInAndroid = async (req, res) => {
     const user = await User.findOne(userData);
     const token = jwt.sign({ userId: user.userId, name: user.name, username: user.username, email: user.email }, process.env.JWT_SECRET);
 
-    res.json({
+    res.json({error:false,
       message: 'Successfully authenticated',
       user: { name: user.name, username: user.username, email: user.email, token }
     });
   } catch (error) {
-    res.status(400).json({ error: 'Invalid token' });
+    res.status(400).json({ error:true, message:"invalid token" });
   }
 };

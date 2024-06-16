@@ -14,18 +14,10 @@ const Post = {
 
   getAll: async () => {
     try {
-      const [rows] = await db.execute('SELECT * FROM posts');
-      const postsWithLikers = await Promise.all(rows.map(async (posts) => {
-        const [likers] = await db.execute(
-          "SELECT COUNT(*) AS likerCount FROM likepost WHERE postId = ?",
-          [posts.postId]
-        );
-        return {
-          ...posts,
-          likerCount: likers[0].likerCount // Adding the liker count to the comment object
-        };
-      }));;
-      return postsWithLikers;
+      const [rows] = await db.execute(
+        "SELECT p.*, COALESCE(l.likeCount, 0) AS LikerCount, COALESCE(ls.likeStatus, 0) AS likeStat, COALESCE(c.commentCount, 0) AS commentCount FROM posts p LEFT JOIN (SELECT postId, COUNT(*) as likeCount FROM likepost GROUP BY postId) l ON p.postId = l.postId LEFT JOIN (SELECT postId, 1 AS likeStatus FROM likepost where userId = 2) ls ON p.postId = ls.postId LEFT JOIN (SELECT postId, COUNT(*) as commentCount FROM comments GROUP BY postId) c ON c.postID = p.postId",
+      )//[users.userId];
+      return rows;
     } catch (error) {
       throw new Error(error.message);
     }
@@ -42,9 +34,14 @@ const Post = {
           "SELECT COUNT(*) AS likerCount FROM likepost WHERE postId = ?",
           [posts.postId]
         );
+        const [comments] = await db.execute(
+          "SELECT COUNT(*) AS commentCount FROM comments where postId =?",
+          [posts.postId]
+        );
         return {
           ...posts,
-          likerCount: likers[0].likerCount // Adding the liker count to the comment object
+          likerCount: likers[0].likerCount, // Adding the liker count to the comment object
+          commentCount: comments[0].commentCount // Adding comment count
         };
       }));;
       return postsWithLikers[0];
