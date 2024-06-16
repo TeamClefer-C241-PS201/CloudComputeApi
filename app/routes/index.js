@@ -1,6 +1,7 @@
 // routes/index.js
 const express = require('express');
 const ensureAuthenticated = require('../middleware/ensureAuthenticate');
+const optionalAuthentication = require('../middleware/optionalAuthenticate');
 const router = express.Router();
 const postController = require('../controllers/discusstionController.js');
 const authController = require('../controllers/authController');
@@ -24,13 +25,13 @@ router.get('/protected', ensureAuthenticated, (req, res) => {
 
 //Post
 router.post('/posts', ensureAuthenticated,postController.createPost);
-router.get('/posts', postController.getAllPosts);
-router.get('/posts/:postId',ensureAuthenticated, postController.getPostById);
+router.get('/posts',optionalAuthentication, postController.getAllPosts);
+router.get('/posts/:postId',optionalAuthentication, postController.getPostById);
 router.delete('/:postId/delete',ensureAuthenticated, postController.deletePostById);
 
 //Comments
 router.post('/posts/:postId/comments/create',ensureAuthenticated, commentController.createComment);
-router.get('/posts/:postId/comments/',ensureAuthenticated, commentController.getCommentById );
+router.get('/posts/:postId/comments/',optionalAuthentication, commentController.getCommentById );
 router.delete('/:postId/:commentId/delete',ensureAuthenticated, commentController.deleteCommentById );
 
 //Like Posts & Comments
