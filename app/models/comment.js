@@ -30,8 +30,8 @@ const Comment = {
           [comment.commentId]
         );
         const [likestatus] = await db.execute(
-          "SELECT COALESCE((SELECT 1 FROM likecomment WHERE commentId = ? AND userId = 2), 0) AS likeStat;",
-          [comment.commentId]
+          "SELECT COALESCE((SELECT 1 FROM likecomment WHERE commentId = ? AND userId = ?), 0) AS likeStat;",
+          [comment.commentId,comment.userId]
         );
         return {
           ...comment,
