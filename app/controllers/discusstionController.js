@@ -16,7 +16,7 @@ const createPost = async (req, res) => {
 
 const getAllPosts = async (req, res) => {
   try {
-    const userId =req.user.userId ? req.user.userId : null;
+    const userId =req.user ? req.user.userId : null;
     console.log(userId)
     const posts = await Post.getAll(userId);
     res.status(200).json(posts);
@@ -28,7 +28,7 @@ const getAllPosts = async (req, res) => {
 const getPostById = async (req, res) => {
   try {
     const postId = req.params.postId;
-    const userId = req.user.userId;
+    const userId = req.user ? req.user.userId : null;
     const post = await Post.getById(postId,userId);
     res.status(200).json(post);
   } catch (error) {

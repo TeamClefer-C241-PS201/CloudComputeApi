@@ -77,7 +77,7 @@ const Post = {
           WHERE p.postId = ?
         `;
     
-        const [rows] = await db.execute(query, [userId, postId]);
+        const [rows] = await db.execute(query, [userId||null , postId]);
     
         if (rows.length === 0) {
           throw new Error('Post not found');
