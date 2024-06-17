@@ -152,6 +152,18 @@ exports.edit = async (req, res) => {
   });
 };
 
+exports.getUser = async (req,res) => {
+  try{
+    userId = req.user.userId;
+    console.log(userId);
+    const userData = await User.getData(userId);
+    res.status(200).json(userData);
+  }catch (error){
+    console.error(error.message);
+    res.status(500).json({error:true, message:'Something Went Wrong'});
+  }
+};
+
 exports.googleSignInAndroid = async (req, res) => {
   const idToken = req.body.idToken;
 

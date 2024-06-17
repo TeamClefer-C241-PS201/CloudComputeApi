@@ -54,6 +54,18 @@ User.getUserByEmail = async (email) => {
   return rows[0];
 };
 
+User.getData = async(userId) => {
+  try{
+  const [rows] = await connection.execute("SELECT userId, name, username, email, userPhoto From users WHERE userId = ?",
+    [userId
+  ]);
+  return rows[0];
+  }catch (err) {
+    console.error("Error getting userData:", err);
+    throw err; 
+  }
+};
+
 User.findOne = async (userData) => {
   const [rows] = await connection.execute(
     "SELECT * FROM users WHERE googleId = ?",
