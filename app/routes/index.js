@@ -39,9 +39,10 @@ router.delete('/:postId/:commentId/delete',ensureAuthenticated, commentControlle
 router.post('/posts/:postId/like',ensureAuthenticated, postController.likePost);
 router.post('/posts/:postId/:commentId/like',ensureAuthenticated, commentController.likeComment);
 
-
-module.exports = router;
-
 //articles
 router.get('/articles', articleController.getAllArticles);
 router.get('/articles/:id', articleController.getArticleById);
+
+module.exports = router;
+
+
