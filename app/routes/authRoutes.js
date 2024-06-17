@@ -16,7 +16,8 @@ router.get('/logout', authController.logout);
 //user routes
 router.post('/register', upload.none(), authController.registerUser);
 router.post('/login', upload.none(), authController.login);
-router.put('/users/:userId', ensureAuthenticate,authController.edit);
+router.put('/users', ensureAuthenticate,authController.edit);
+router.get('/userdata',ensureAuthenticate, authController.getUser)
 
 module.exports = router;
 

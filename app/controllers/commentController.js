@@ -18,7 +18,8 @@ const createComment = async (req, res) => {
 const getCommentById = async (req, res) => {
   try {
     const postId = req.params.postId;
-    const comments = await Comment.getComment(postId);
+    const userId = req.user.userId;
+    const comments = await Comment.getComment(postId,userId);
     res.status(200).json( comments);
   } catch (error) {
     res.status(404).json({error:true, message: error.message });

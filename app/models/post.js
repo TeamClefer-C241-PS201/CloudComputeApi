@@ -43,32 +43,51 @@ const Post = {
       }
     },
 
-  getById: async (postId) => {
-    try {
-      const [rows] = await db.execute('SELECT p.userId, postId, postTitle, postDesc, postDate, name, createdAt FROM posts p LEFT JOIN users u on p.userId = u.userId WHERE postId = ?', [postId]);
-      if (rows.length === 0) {
-        throw new Error('Post not found');
+    getById: async (postId, userId) => {
+      try {
+        const query = `
+          SELECT 
+            p.userId, 
+            p.postId, 
+            p.postTitle, 
+            p.postDesc, 
+            p.postDate, 
+            u.name, 
+            u.createdAt,
+            COALESCE(l.likeCount, 0) AS likerCount,
+            COALESCE(c.commentCount, 0) AS commentCount,
+            COALESCE(ls.likeStat, 0) AS likeStat
+          FROM posts p
+          LEFT JOIN users u ON p.userId = u.userId
+          LEFT JOIN (
+            SELECT postId, COUNT(*) AS likeCount 
+            FROM likepost 
+            GROUP BY postId
+          ) l ON p.postId = l.postId
+          LEFT JOIN (
+            SELECT postId, COUNT(*) AS commentCount 
+            FROM comments 
+            GROUP BY postId
+          ) c ON p.postId = c.postId
+          LEFT JOIN (
+            SELECT postId, 1 AS likeStat 
+            FROM likepost 
+            WHERE userId = ?
+          ) ls ON p.postId = ls.postId
+          WHERE p.postId = ?
+        `;
+    
+        const [rows] = await db.execute(query, [userId, postId]);
+    
+        if (rows.length === 0) {
+          throw new Error('Post not found');
+        }
+        
+        return rows[0];
+      } catch (error) {
+        throw new Error(error.message);
       }
-      const postsWithLikers = await Promise.all(rows.map(async (posts) => {
-        const [likers] = await db.execute(
-          "SELECT COUNT(*) AS likerCount FROM likepost WHERE postId = ?",
-          [posts.postId]
-        );
-        const [comments] = await db.execute(
-          "SELECT COUNT(*) AS commentCount FROM comments where postId =?",
-          [posts.postId]
-        );
-        return {
-          ...posts,
-          likerCount: likers[0].likerCount, // Adding the liker count to the comment object
-          commentCount: comments[0].commentCount // Adding comment count
-        };
-      }));;
-      return postsWithLikers[0];
-    } catch (error) {
-      throw new Error(error.message);
-    }
-  },
+    },
 
   deleteById: async (postId) => {
     try {

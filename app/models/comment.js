@@ -15,7 +15,7 @@ const Comment = {
     }
   },
 
-  getComment: async (postId) => {
+  getComment: async (postId,userId) => {
     try {
       const [rows] = await db.execute(
         "SELECT c.userId, commentId, postId, commentBody, commentDate, name, createdAt FROM comments c LEFT JOIN users u on c.userId = u.userId WHERE postId = ?",
@@ -30,8 +30,8 @@ const Comment = {
           [comment.commentId]
         );
         const [likestatus] = await db.execute(
-          "SELECT COALESCE((SELECT 1 FROM likecomment WHERE commentId = ? AND userId = 2), 0) AS likeStat;",
-          [comment.commentId]
+          "SELECT COALESCE((SELECT 1 FROM likecomment WHERE commentId = ? AND userId = ?), 0) AS likeStat;",
+          [comment.commentId,userId || null]
         );
         return {
           ...comment,

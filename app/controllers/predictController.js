@@ -2,12 +2,6 @@ const express = require('express');
 const tf = require('@tensorflow/tfjs-node');
 const crypto = require('crypto');
 const db = require('../config/dbConfig')
-// const { Firestore } = require('@google-cloud/firestore');
-
-// // Create a Firestore instance
-// const db = new Firestore();
-
-// const router = express.Router();
 
 const getClassification = async (model, image) => {
     try {
@@ -88,7 +82,6 @@ const getPredictions = async (req, res) => {
         const [articles] = await db.execute('SELECT * from articles WHERE articleId=?', [articleId]);
         // console.log(articles[0]);
 
-        // await db.execute('articles').where({ id: articleId }).first();
 
         if (!articles) {
             return res.status(404).json({error:true, status: 'error', message: 'Article not found' });
