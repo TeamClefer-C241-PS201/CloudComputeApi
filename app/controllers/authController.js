@@ -128,7 +128,7 @@ exports.edit = async (req, res) => {
     }
 
     const { name, username, email } = req.body;
-    const userId = 2; // development purpost
+    const userId = req.user.userId; //development purpose
 
     try {
       let userPhotoUrl = null;
