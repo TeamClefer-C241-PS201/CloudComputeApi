@@ -11,7 +11,7 @@ const upload = multer({ storage: multer.memoryStorage() });
 router.post('/auth/google/android', authController.googleSignInAndroid);
 router.get('/auth/google', passport.authenticate('google', { scope: ['email','profile'] }));
 router.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/failure' }), authController.googleCallback);
-router.get('/logout', authController.logout);
+router.post('/logout', ensureAuthenticate,authController.logout);
 
 //user routes
 router.post('/register', upload.none(), authController.registerUser);

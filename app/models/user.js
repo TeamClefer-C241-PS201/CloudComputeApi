@@ -88,21 +88,29 @@ User.create = async (userData) => {
   }
 };
 
-User.edit = async (userId, name, username, email, userPhoto) => {
+User.edit = async (userId, updatedFields) => {
   try {
-    // Ensure optional parameters are defaulted to null if not provided
-    name = name || null;
-    username = username || null;
-    email = email || null;
-    userPhoto = userPhoto || null;
+    if (Object.keys(updatedFields).length === 0) {
+      throw new Error('No fields to update');
+    }
 
-    const query = `
-      UPDATE users 
-      SET name = ?, username = ?, email = ?, userPhoto = ?
-      WHERE userId = ?
-    `;
-    const [result] = await connection.execute(query, [name, username, email, userPhoto, userId]);
-    
+    // Initialize the SQL query parts
+    let query = 'UPDATE users SET ';
+    const params = [];
+
+    // Construct SET clause dynamically
+    Object.keys(updatedFields).forEach((key, index) => {
+      if (index > 0) query += ', ';
+      query += `${key} = ?`;  // Add placeholder for each field
+      params.push(updatedFields[key]);  // Add value to params array
+    });
+
+    // Add WHERE clause for userId
+    query += ' WHERE userId = ?';
+    params.push(userId);
+
+    const [result] = await connection.execute(query, params);
+
     return result; // Return the result of the update operation
   } catch (error) {
     throw error;

@@ -10,9 +10,7 @@ const upload = multer({ storage: multer.memoryStorage() }).single('userPhoto');
 
 
 exports.logout = (req, res) => {
-  req.logout();
-  res.json({ message: "Logged out" });
-  res.redirect("/");
+  res.json({ error:false,message: "Logged out" });
 };
 
 exports.googleCallback = (req, res) => {
@@ -124,11 +122,11 @@ exports.login = async (req, res) => {
 exports.edit = async (req, res) => {
   upload(req, res, async (err) => {
     if (err) {
-      return res.status(500).json({error:true, message: 'Error uploading file' });
+      return res.status(500).json({ error: true, message: 'Error uploading file' });
     }
 
     const { name, username, email } = req.body;
-    const userId = req.user.userId; //development purpose
+    const userId = req.user.userId; // Get userId from authenticated user
 
     try {
       let userPhotoUrl = null;
@@ -137,17 +135,28 @@ exports.edit = async (req, res) => {
         userPhotoUrl = await User.uploadPhoto(userId, req.file);
       }
 
-      console.log({ name, username, email, userPhoto: userPhotoUrl, userId });
-      const result = await User.edit(userId, name, username, email, userPhotoUrl);
+      // Prepare updatedFields object with non-empty values
+      const updatedFields = {};
+      if (name) updatedFields.name = name;
+      if (username) updatedFields.username = username;
+      if (email) updatedFields.email = email;
+      if (userPhotoUrl) updatedFields.userPhoto = userPhotoUrl;
+
+      // Call User.edit method with userId and updatedFields
+      const result = await User.edit(userId, updatedFields);
 
       if (result.affectedRows > 0) {
-        res.status(200).json({error:false, message: 'User updated successfully',user:{userId, name, username, email, userPhotoUrl} });
+        res.status(200).json({
+          error: false,
+          message: 'User updated successfully',
+          user: { userId, name, username, email, userPhoto: userPhotoUrl }
+        });
       } else {
-        res.status(404).json({error:true, message: 'User not found' });
+        res.status(404).json({ error: true, message: 'User not found' });
       }
     } catch (error) {
       console.error(error.message);
-      res.status(500).json({error:true, message: 'Server error' });
+      res.status(500).json({ error: true, message: 'Server error' });
     }
   });
 };
