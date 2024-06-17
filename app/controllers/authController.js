@@ -94,30 +94,38 @@ exports.login = async (req, res) => {
     // Find user by email
     const user = await getUserByEmail(email);
     if (!user) {
-      return res.status(401).json({error:true, message: "Invalid email" });
+      return res.status(401).json({ message: "Email is not registered yet" });
     }
 
     // Validate password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(401).json({error:true, message: "Invalid password" });
+      return res.status(401).json({ error: true, message: "Invalid password" });
     }
+
     const [userdata] = await connectionPool.query(
       "SELECT userId, username, name, userPhoto FROM users WHERE email = ?",
       [email]
     );
-    console.log(userdata[0]);
-    const { username, name, userPhoto, userId} = userdata[0];
-    // Create and sign JWT token
-    const token = jwt.sign({userId: user.userId, name: user.name, username: user.username, email: user.email }, process.env.JWT_SECRET);
 
-    res.json({error:false,
-      message: "Welcome!", 
-      user: {userId,name,username,email,userPhoto,token}
+    const { username, name, userPhoto, userId } = userdata[0];
+
+    // Create and sign JWT token
+    const token = jwt.sign(
+      { userId: userId, name: name, username: username, email: email },
+      process.env.JWT_SECRET,
+      { expiresIn: '1h' } // Set token expiry as needed
+    );
+
+    res.json({
+      error: false,
+      message: "Welcome!",
+      user: { userId, name, username, email, userPhoto },
+      token: `Bearer ${token}` // Include Bearer prefix
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({error:true, message: "Server Error" });
+    res.status(500).json({ error: true, message: "Server Error" });
   }
 };
 
