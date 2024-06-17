@@ -2,10 +2,12 @@
 require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
-const passport = require('./app/config/passport'); 
+const passport = require('./app/config/passport');
 const indexRoutes = require('./app/routes/index');
 const authRoutes = require('./app/routes/authRoutes');
+const predictRoutes = require('./app/routes/predictRoutes');
 const mysql = require('mysql2');
+const loadModel = require('./loadModel');
 require('dotenv').config();
 const bodyParser = require('body-parser');
 const multer = require('multer');
@@ -55,7 +57,16 @@ app.use(passport.session());
 app.use('/', indexRoutes);
 app.use('/', authRoutes);
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+loadModel().then(model => {
+  app.locals.model = model;
+  app.use('/', predictRoutes);
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+})
+
+// const PORT = process.env.PORT || 3000;
+// app.listen(PORT, () => {
+//   console.log(`Server running on port ${PORT}`);
+// });

@@ -51,7 +51,8 @@ exports.up = async (knex) => {
   await knex.schema.createTable("articles", (table) => {
     table.increments("articleId").primary();
     table.string("articleTitle", 255).notNullable();
-    table.string("articleDesc", 255).notNullable();
+    table.text("articleDesc").notNullable();
+    table.string("articleImg", 255).notNullable();
   });
   // Diseases table
   await knex.schema.createTable("diseases", (table) => {

@@ -1,7 +1,7 @@
 const express = require('express');
 const tf = require('@tensorflow/tfjs-node');
 const crypto = require('crypto');
-const db = require('../config/dbConfig')
+const db = require('../config/dbConfig');
 // const { Firestore } = require('@google-cloud/firestore');
 
 // // Create a Firestore instance
@@ -9,18 +9,15 @@ const db = require('../config/dbConfig')
 
 // const router = express.Router();
 
-const getClassification = async (model, image) => {
+const getClassification = async (model, imageBuffer) => {
     try {
         const tensor = tf.node
-            .decodeJpeg(image.buffer)
+            .decodeJpeg(imageBuffer)
             .resizeNearestNeighbor([256, 256])
             .expandDims()
             .toFloat();
 
         const prediction = model.predict(tensor);
-        // const score = await prediction.data();
-        // const confidenceScore = Math.max(...score) * 100;
-
         const classes = ['Blight', 'Common_Rust', 'Gray_Leaf_Spot', 'Healthy'];
         const classResult = tf.argMax(prediction, 1).dataSync()[0];
         const label = classes[classResult];
@@ -59,54 +56,49 @@ const getClassification = async (model, image) => {
 
 const getPredictions = async (req, res) => {
     try {
-        const { file } = req; // Assuming the image is sent in the body. Adjust this as per your requirement.
+        const { base64Image } = req.body; // Assuming the image is sent as base64 string in the body.
         const { model } = req.app.locals; // Assuming the model is stored in app locals.
 
-        if (!file) {
+        if (!base64Image) {
             return res.status(400).json({error:true, status: 'error', message: 'Data Gambar Diperlukan' });
         }
 
-        const { result, description, suggestion } = await getClassification(model, file);
+        // Decode base64 to buffer
+        const imageBuffer = Buffer.from(base64Image, 'base64');
+        const { label, result, description, suggestion } = await getClassification(model, imageBuffer);
+
         const id = crypto.randomUUID();
         const createdAt = new Date().toISOString();
 
-        const label = await getClassification(model, file);
-        console.log({ result, description, suggestion })
-        console.log(label.label);
         let articleId;
-
-        if (label.label === 'Blight') {
+        if (label === 'Blight') {
             articleId = 1;
-        } else if (label.label === 'Common_Rust') {
+        } else if (label === 'Common_Rust') {
             articleId = 2;
-        } else if (label.label === 'Gray_Leaf_Spot') {
+        } else if (label === 'Gray_Leaf_Spot') {
             articleId = 3;
-        } else if (label.label === 'Healthy') {
+        } else if (label === 'Healthy') {
             articleId = 4;
         }
 
         const [articles] = await db.execute('SELECT * from articles WHERE articleId=?', [articleId]);
-        // console.log(articles[0]);
-
-        // await db.execute('articles').where({ id: articleId }).first();
 
         if (!articles) {
             return res.status(404).json({error:true, status: 'error', message: 'Article not found' });
         }
 
         const article = articles[0];
-        // console.log(article);
 
         const data = {
             id,
-            "result": result,
-            "description": description,
-            "suggestion": suggestion,
-            "articleTitle": article.articleTitle,
-            "articleDesc": article.articleDesc,
-            "articleImg": article.articleImg,
+            result,
+            description,
+            suggestion,
+            articleTitle: article.articleTitle,
+            articleDesc: article.articleDesc,
+            articleImg: article.articleImg,
             createdAt
-        }
+        };
 
         res.status(201).json({error:false,
             status: 'success',
