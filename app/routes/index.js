@@ -3,7 +3,6 @@ const express = require('express');
 const ensureAuthenticated = require('../middleware/ensureAuthenticate');
 const router = express.Router();
 const postController = require('../controllers/discusstionController.js');
-const authController = require('../controllers/authController');
 const commentController = require('../controllers/commentController.js');
 
 // Development Purpose
